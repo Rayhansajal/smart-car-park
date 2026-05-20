@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
 -- Seed admin user (password: Admin@123)
 INSERT IGNORE INTO users (name, email, password, phone, role)
 VALUES ('System Admin', 'admin@parking.com',
-        '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5E',
+        '$2b$10$HZtQqO1rIHy.g2YDSm8NBuTsXScr5obNdZ1iUpJBUGY7JSlCXV7Du',
         '01700000000', 'ADMIN');
 
 -- Seed a sample parking lot

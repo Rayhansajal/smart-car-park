@@ -1,6 +1,7 @@
 package com.example.smart_car_park.security;
 
-
+import org.springframework.security.core.GrantedAuthority;
+import java.util.List;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -11,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,10 +26,24 @@ public class JwtUtils {
     @Value("${app.jwt.expiration}")
     private long jwtExpiration;
 
-    // ── Generate ──────────────────────────────────────────────────────────────
+
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+
+        Map<String, Object> claims = new HashMap<>();
+
+
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)   // gives "ROLE_ADMIN", "ROLE_DRIVER" 
+                .toList();
+        claims.put("roles", roles);
+
+
+        if (userDetails instanceof com.example.smart_car_park.models.entity.User user) {
+            claims.put("name", user.getName()); // adjust getter to match your field
+        }
+
+        return generateToken(claims, userDetails);
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
@@ -38,11 +52,11 @@ public class JwtUtils {
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .signWith(signingKey())          // JJWT 0.12.x — algorithm inferred from SecretKey
+                .signWith(signingKey())
                 .compact();
     }
 
-    // ── Validate ──────────────────────────────────────────────────────────────
+
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
@@ -70,7 +84,6 @@ public class JwtUtils {
         return false;
     }
 
-    // ── Extract ───────────────────────────────────────────────────────────────
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -84,7 +97,7 @@ public class JwtUtils {
         return resolver.apply(extractAllClaims(token));
     }
 
-    // ── Private ───────────────────────────────────────────────────────────────
+
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
