@@ -93,6 +93,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<BookingResponseDTO> getAllBookings(Pageable pageable) {
         return bookingRepository.findAll(pageable).map(this::mapToResponse);
     }
