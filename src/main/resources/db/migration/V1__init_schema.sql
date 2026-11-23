@@ -93,7 +93,6 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
     CONSTRAINT fk_token_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
 
--- Seed admin user (password: Admin@123)
 INSERT IGNORE INTO users (name, email, password, phone, role)
 VALUES ('System Admin', 'admin@parking.com',
         '$2b$10$HZtQqO1rIHy.g2YDSm8NBuTsXScr5obNdZ1iUpJBUGY7JSlCXV7Du',
